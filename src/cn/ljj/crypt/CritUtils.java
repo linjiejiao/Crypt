@@ -5,9 +5,15 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
+import java.security.Security;
+
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.bouncycastle.openssl.PEMReader;
+import org.bouncycastle.openssl.PasswordFinder;
 
 public class CritUtils {
     public static final String KEY_ALGORITHM = "RSA";
@@ -16,6 +22,7 @@ public class CritUtils {
 
     public static byte[] getFileString(File file) {
         if (file == null || !file.exists()) {
+            System.err.println("getFileString file=" + file);
             return null;
         }
         try {
@@ -44,6 +51,10 @@ public class CritUtils {
 
     public static boolean generateKeyPairsToPath(String folder) {
         KeyPair keyPair = generateKeyPairs();
+        return saveKeyPairToFolder(keyPair, folder);
+    }
+
+    private static boolean saveKeyPairToFolder(KeyPair keyPair, String folder) {
         byte[] publicKeyBytes = keyPair.getPublic().getEncoded();
         File publicKeyFile = new File(folder, "rsa.pub");
         FileOutputStream publicKeyFileOutputStream = null;
@@ -77,5 +88,25 @@ public class CritUtils {
             }
         }
         return false;
+    }
+
+    public static boolean decodePem(String pemPath, String password) throws Exception {
+        File file = new File(pemPath);
+        FileInputStream inputStream = new FileInputStream(file);
+        Security.addProvider(new BouncyCastleProvider());
+        PEMReader reader = new PEMReader(new InputStreamReader(inputStream), new PasswordFinder() {
+            @Override
+            public char[] getPassword() {
+                return password.toCharArray();
+            }
+        });
+        KeyPair keyPair = (KeyPair) reader.readObject();
+        reader.close();
+        String outFolder = file.getAbsolutePath();
+        if(file.getName().contains(".")){
+            outFolder = pemPath.substring(0, pemPath.lastIndexOf("."));
+        }
+        new File(outFolder).mkdirs();
+        return saveKeyPairToFolder(keyPair, outFolder);
     }
 }

@@ -8,12 +8,16 @@ import java.security.spec.X509EncodedKeySpec;
 import javax.crypto.Cipher;
 
 public class Encryptor {
-    private PublicKey mPubKey;
+    protected PublicKey mPubKey;
 
     public Encryptor(byte[] pubKey) throws Exception {
         if (pubKey == null || pubKey.length <= 0) {
             throw new IllegalArgumentException("pubKey can not be empty!");
         }
+        generatePublicKey(pubKey);
+    }
+
+    protected void generatePublicKey(byte[] pubKey) throws Exception {
         X509EncodedKeySpec x509EncodedKeySpec = new X509EncodedKeySpec(pubKey);
         KeyFactory factory = KeyFactory.getInstance(CritUtils.KEY_ALGORITHM);
         mPubKey = factory.generatePublic(x509EncodedKeySpec);
