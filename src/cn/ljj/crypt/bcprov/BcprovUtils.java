@@ -10,7 +10,7 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.openssl.PEMReader;
 import org.bouncycastle.openssl.PasswordFinder;
 
-import cn.ljj.crypt.CritUtils;
+import cn.ljj.crypt.CryptUtils;
 
 public class BcprovUtils {
 
@@ -31,6 +31,6 @@ public class BcprovUtils {
             outFolder = pemPath.substring(0, pemPath.lastIndexOf("."));
         }
         new File(outFolder).mkdirs();
-        return CritUtils.saveKeyPairToFolder(keyPair, outFolder);
+        return CryptUtils.saveKeyPairToFolder(keyPair, outFolder);
     }
 }

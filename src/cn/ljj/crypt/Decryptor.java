@@ -14,12 +14,12 @@ public class Decryptor extends RSADecryptor {
     }
 
     public Decryptor(File rivateKeyFile) throws Exception {
-        this(CritUtils.getFileString(rivateKeyFile));
+        this(CryptUtils.getFileString(rivateKeyFile));
     }
 
     protected void generatePrivateKey(byte[] privateKey) throws Exception {
         PKCS8EncodedKeySpec pkcs8EncodedKeySpec = new PKCS8EncodedKeySpec(privateKey);
-        KeyFactory factory = KeyFactory.getInstance(CritUtils.KEY_ALGORITHM);
+        KeyFactory factory = KeyFactory.getInstance(CryptUtils.KEY_ALGORITHM);
         mPrivateKey = factory.generatePrivate(pkcs8EncodedKeySpec);
     }
 }
