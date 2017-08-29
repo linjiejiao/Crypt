@@ -7,7 +7,8 @@ import cn.ljj.crypt.CritUtils;
 import cn.ljj.crypt.Decryptor;
 import cn.ljj.crypt.DerEncryptor;
 import cn.ljj.crypt.Encryptor;
-import cn.ljj.crypt.PemDecryptor;
+import cn.ljj.crypt.bcprov.BcprovUtils;
+import cn.ljj.crypt.bcprov.PemDecryptor;
 
 public class Main {
 
@@ -26,7 +27,7 @@ public class Main {
         File pemFile = new File(home + File.separator + "private_key.pem");
         if (pemFile.exists()) {
             try {
-                CritUtils.decodePem(pemFile.getAbsolutePath(), "123456");
+                BcprovUtils.decodePem(pemFile.getAbsolutePath(), "123456");
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -44,6 +45,7 @@ public class Main {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        System.out.println("\n====================");
         try {
             home = home + File.separator + "private_key";
             byte[] original = "asdfghjkl".getBytes();
@@ -58,6 +60,17 @@ public class Main {
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+        System.out.println("\n====================");
+        byte[] original = "zxcvbnm".getBytes();
+        System.out.println("original.length=" + original.length);
+        System.out.println("original=" + Base64.getEncoder().encodeToString(original));
+        byte[] encrypted = CritUtils.symmetricalEncrypt(original, "123456".getBytes());
+        System.out.println("encrypted.length=" + encrypted.length);
+        System.out.println("encrypted=" + Base64.getEncoder().encodeToString(encrypted));
+        byte[] decrypted = CritUtils.symmetricalDecrypt(encrypted, "123456".getBytes());
+        System.out.println("decrypted.length=" + decrypted.length);
+        System.out.println("decrypted=" + Base64.getEncoder().encodeToString(decrypted));
     }
 
 }

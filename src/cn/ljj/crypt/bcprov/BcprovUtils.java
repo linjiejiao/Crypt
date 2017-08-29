@@ -1,4 +1,4 @@
-package cn.ljj.crypt;
+package cn.ljj.crypt.bcprov;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -10,13 +10,13 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.openssl.PEMReader;
 import org.bouncycastle.openssl.PasswordFinder;
 
-public class PemDecryptor extends RSADecryptor {
+import cn.ljj.crypt.CritUtils;
 
-    public PemDecryptor(File rivateKeyFile, String password) throws Exception {
-        if (rivateKeyFile == null) {
-            throw new IllegalArgumentException("rivateKeyFile can not be empty!");
-        }
-        FileInputStream inputStream = new FileInputStream(rivateKeyFile);
+public class BcprovUtils {
+
+    public static boolean decodePem(String pemPath, String password) throws Exception {
+        File file = new File(pemPath);
+        FileInputStream inputStream = new FileInputStream(file);
         Security.addProvider(new BouncyCastleProvider());
         PEMReader reader = new PEMReader(new InputStreamReader(inputStream), new PasswordFinder() {
             @Override
@@ -26,7 +26,11 @@ public class PemDecryptor extends RSADecryptor {
         });
         KeyPair keyPair = (KeyPair) reader.readObject();
         reader.close();
-        mPrivateKey = keyPair.getPrivate();
+        String outFolder = file.getAbsolutePath();
+        if (file.getName().contains(".")) {
+            outFolder = pemPath.substring(0, pemPath.lastIndexOf("."));
+        }
+        new File(outFolder).mkdirs();
+        return CritUtils.saveKeyPairToFolder(keyPair, outFolder);
     }
-
 }
